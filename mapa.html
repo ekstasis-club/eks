@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EKS.TA.SIS</title>
+    
+    <link href="https://fonts.cdnfonts.com/css/pricedown" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --gta-orange: #FFAB00;
+            --gta-pink: #FF69B4; 
+            --neon-pink: #FF2F92;
+            --gta-dark: #000000;
+            --hud-bg: rgba(0, 0, 0, 0.7);
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Arial', sans-serif;
+            background-color: var(--gta-dark);
+        }
+
+        .gta-font {
+            font-family: 'Pricedown', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .title-underground {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.6rem;
+            letter-spacing: 0.35rem;
+            color: var(--neon-pink);
+            text-transform: uppercase;
+            text-shadow:
+                0 0 10px rgba(255,47,146,0.6),
+                0 0 25px rgba(255,47,146,0.9),
+                0 0 45px rgba(255,47,146,1);
+            animation: pulse 2s infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.85; }
+            50% { opacity: 1; }
+            100% { opacity: 0.85; }
+        }
+
+        p {
+            letter-spacing: 3px;
+            opacity: 0.7;
+            margin-bottom: 1.8rem;
+        }
+
+        .password-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid var(--neon-pink);
+            color: white;
+            padding: 12px 25px;
+            font-size: 1.4rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            border-radius: 4px;
+            letter-spacing: 5px;
+            box-shadow: inset 0 0 10px rgba(255, 47, 146, 0.2);
+        }
+
+        .password-btn:hover {
+            background: var(--neon-pink);
+            color: black;
+            box-shadow: 0 0 20px var(--neon-pink);
+        }
+
+        .dots {
+            font-size: 1.8rem;
+            line-height: 0;
+            position: relative;
+            top: -2px;
+        }
+
+        .main-container {
+            position: relative;
+            min-width: 1200px; 
+            min-height: 100vh;
+            aspect-ratio: 16 / 9; 
+            background-image: url('image_2.png');
+            background-size: 100% 100%;
+            background-position: center;
+            background-color: #050505;
+            overflow: hidden;
+            margin: 0 auto; 
+        }
+
+        /* --- EFECTOS AMBIENTALES --- */
+        .smoke-container {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            overflow: hidden; z-index: 5; pointer-events: none;
+        }
+
+       .smoke-particle {
+            position: absolute;
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0) 70%);
+            border-radius: 50%; filter: blur(30px); opacity: 0;
+            animation: smokeMove 20s infinite linear;
+        }
+
+        /* Modificado con retrasos negativos para que el humo esté visible desde el inicio */
+        .s1 { top: 20%; left: 110%; animation-delay: -15s; width: 800px; }
+        .s2 { top: 50%; left: 110%; animation-delay: -8s; width: 600px; }
+        .s3 { top: -10%; left: 110%; animation-delay: -18s; width: 900px; }
+        .s4 { top: 70%; left: 110%; animation-delay: -4s; width: 700px; }
+
+        @keyframes smokeMove {
+            0% { transform: translateX(0) scale(1); opacity: 0; }
+            2% { opacity: 0.8; }
+            90% { opacity: 0.8; }
+            100% { transform: translateX(-150vw) scale(1.5); opacity: 0; }
+        }
+
+        .flash-effect {
+            position: fixed; inset: 0; background: white; opacity: 0; z-index: 200; pointer-events: none;
+        }
+        .flash-active { animation: flashAnim 0.4s ease-out; }
+        @keyframes flashAnim {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .fog-burst {
+            position: fixed; top: 50%; left: 50%; width: 20px; height: 20px;
+            background: radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0) 70%);
+            border-radius: 50%; filter: blur(15px); z-index: 60; pointer-events: none;
+            opacity: 0; transform: translate(-50%, -50%);
+        }
+        .burst-active { animation: fogBurstAnim 0.8s cubic-bezier(0.165, 0.84, 0.44, 1); }
+        @keyframes fogBurstAnim {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(70); opacity: 0; }
+        }
+
+        .strobe {
+            position: absolute; inset: 0; background: rgba(255,255,255,0.85);
+            animation: strobe 4s infinite; pointer-events: none; z-index: 30; mix-blend-mode: overlay;
+        }
+
+        @keyframes strobe {
+            0%, 92%, 100% { opacity: 0; }
+            93% { opacity: 1; }
+            94% { opacity: 0; }
+            95% { opacity: 1; }
+            96% { opacity: 0; }
+        }
+
+        .spotlight {
+            position: absolute; top: -18vh; width: 60vw; height: 150vh;
+            background: linear-gradient(to bottom, rgba(255,47,146,0.3), rgba(255,47,146,0));
+            clip-path: polygon(50% 0, 100% 100%, 0 100%);
+            filter: blur(35px); opacity: 0.55; z-index: 2;
+            animation: swing 4s infinite alternate ease-in-out; pointer-events: none;
+        }
+
+        .spotlight.left { left: -18%; }
+        .spotlight.right { right: -18%; animation-duration: 5s; }
+
+        @keyframes swing {
+            from { transform: rotate(-12deg); }
+            to { transform: rotate(12deg); }
+        }
+
+        /* --- FLECHAS (MARKERS) --- */
+        .mission-marker {
+            position: absolute;
+            width: 40px;
+            height: 60px;
+            background: var(--neon-pink);
+            clip-path: polygon(50% 100%, 100% 60%, 70% 60%, 70% 0%, 30% 0%, 30% 60%, 0% 60%);
+            animation: pulse-marker 1.5s infinite;
+            cursor: pointer;
+            z-index: 100;
+        }
+
+        /* Flecha Derecha */
+        .marker-right { 
+            top: 52%; left: 90%; 
+            transform: translate(-50%, -50%) rotate(-90deg);
+            animation: pulse-marker-right 1.5s infinite; 
+        }
+
+        /* Flecha Centro */
+        .marker-center { top: 40%; left: 53%; transform: translate(-50%, -50%); }
+
+        /* Flecha Izquierda */
+        .marker-left { 
+            top: 46%; left: 18%; 
+            transform: translate(-50%, -50%) rotate(180deg);
+            animation: pulse-marker-up 1.5s infinite;
+        }
+
+        @keyframes pulse-marker {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.8; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        @keyframes pulse-marker-up {
+            0% { transform: translate(-50%, -50%) rotate(180deg) scale(1); opacity: 1; }
+            50% { transform: translate(-50%, -50%) rotate(180deg) scale(1.2); opacity: 0.8; }
+            100% { transform: translate(-50%, -50%) rotate(180deg) scale(1); opacity: 1; }
+        }
+
+        @keyframes pulse-marker-right {
+            0% { transform: translate(-50%, -50%) rotate(-90deg) scale(1); opacity: 1; }
+            50% { transform: translate(-50%, -50%) rotate(-90deg) scale(1.2); opacity: 0.8; }
+            100% { transform: translate(-50%, -50%) rotate(-90deg) scale(1); opacity: 1; }
+        }
+
+        /* --- MODALES --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8); display: flex; justify-content: center;
+            align-items: center; z-index: 300; opacity: 0; pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: all; }
+
+        .gta-alert-box {
+            background: linear-gradient(to bottom, #1a1a1a, #000);
+            border: 4px solid var(--neon-pink); width: 90%; max-width: 600px;
+            text-align: center; transform: scale(0.8);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 0 30px rgba(255, 47, 146, 0.4);
+            padding-bottom: 20px;
+        }
+        .modal-overlay.active .gta-alert-box { transform: scale(1); }
+
+        .alert-header { background: var(--neon-pink); color: black; padding: 10px; font-size: 2rem; }
+        .alert-body { padding: 30px 10px; color: white; }
+
+        /* --- CONTROLES MÓVIL --- */
+        .mobile-nav-controls {
+            display: flex;
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 150;
+            gap: 50px; 
+        }
+
+        .nav-btn {
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid var(--neon-pink);
+            color: var(--neon-pink);
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(255, 47, 146, 0.3);
+            transition: all 0.2s ease;
+            -webkit-tap-highlight-color: transparent; 
+        }
+
+        /* --- MEDIA QUERIES --- */
+        @media (min-width: 769px) { 
+            .mobile-nav-controls { display: none; } 
+        }
+
+        /* Modificado para adaptar las luces en la versión móvil */
+        @media (max-width: 768px) {
+            .spotlight {
+                width: 100vw; 
+            }
+            .spotlight.left { 
+                left: 25%; 
+            }
+            .spotlight.right { 
+                right: 25%; 
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="screenFlash" class="flash-effect"></div>
+    <div id="fogBurst" class="fog-burst"></div>
+
+    <audio id="openSound" src="https://assets.mixkit.co/active_storage/sfx/2570/2570-preview.m4a"></audio>
+    <audio id="alertSound" src="https://assets.mixkit.co/active_storage/sfx/2866/2866-preview.m4a"></audio>
+
+    <div class="main-container">
+        <div class="smoke-container">
+            <div class="smoke-particle s1"></div>
+            <div class="smoke-particle s2"></div>
+            <div class="smoke-particle s3"></div>
+            <div class="smoke-particle s4"></div>
+        </div>
+
+        <div class="spotlight left"></div>
+        <div class="spotlight right"></div>
+        <div class="strobe"></div>
+
+        <div id="arrowLeft" class="mission-marker marker-left"></div>
+        <div id="arrowCenter" class="mission-marker marker-center"></div>
+        <div id="arrowTrigger" class="mission-marker marker-right"></div>
+    </div>
+
+    <div class="mobile-nav-controls">
+        <button id="btnScrollLeft" class="nav-btn"><i class="fas fa-chevron-left"></i></button>
+        <button id="btnScrollRight" class="nav-btn"><i class="fas fa-chevron-right"></i></button>
+    </div>
+
+    <div class="modal-overlay" id="alertModal">
+        <div class="gta-alert-box">
+            <div class="gta-font alert-header">POPUP STORES</div>
+            <div class="alert-body">
+                <h2 class="title-underground">EKS.TA.SIS VUELVE</h2>
+                <p>La warehouse se nos ha quedado pequeña.<br />Más información pronto.</p>
+                <button class="password-btn closeModalBtn">
+                    <span class="dots">••••</span>
+                    <i class="fas fa-lock"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="alertModal2">
+        <div class="gta-alert-box">
+            <div class="gta-font alert-header">STAGE DESIGN</div>
+            <div class="alert-body">
+                <h2 class="title-underground">NUEVA UBICACIÓN</h2>
+                <p>Has encontrado el punto de encuentro.<br />Prepárate para el despliegue.</p>
+                <button class="password-btn closeModalBtn">
+                    <span class="dots">••••</span>
+                    <i class="fas fa-check"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="alertModal3">
+        <div class="gta-alert-box">
+            <div class="gta-font alert-header">LINE UP REVEAL</div>
+            <div class="alert-body">
+                <h2 class="title-underground">ACCESO RESTRINGIDO</h2>
+                <p>Solo los más rápidos entrarán.<br />El código será revelado en la oscuridad.</p>
+                <button class="password-btn closeModalBtn">
+                    <span class="dots">••••</span>
+                    <i class="fas fa-skull"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const centerContent = () => {
+                const scrollX = (document.documentElement.scrollWidth - window.innerWidth) / 2;
+                const scrollY = (document.documentElement.scrollHeight - window.innerHeight) / 2;
+                window.scrollTo(scrollX, scrollY);
+            };
+
+            centerContent();
+            setTimeout(() => { document.documentElement.style.scrollBehavior = "smooth"; }, 100);
+
+            const flash = document.getElementById('screenFlash');
+            const burst = document.getElementById('fogBurst');
+            const openSound = document.getElementById('openSound');
+            const alertSound = document.getElementById('alertSound');
+
+            const openModal = (modalId) => {
+                openSound.play().catch(() => {});
+                setTimeout(() => alertSound.play().catch(() => {}), 300);
+
+                flash.classList.remove('flash-active');
+                void flash.offsetWidth; 
+                flash.classList.add('flash-active');
+
+                burst.classList.remove('burst-active');
+                void burst.offsetWidth; 
+                burst.classList.add('burst-active');
+
+                document.getElementById(modalId).classList.add('active');
+            };
+
+            // Click Flechas
+            document.getElementById('arrowLeft').addEventListener('click', () => openModal('alertModal3'));
+            document.getElementById('arrowCenter').addEventListener('click', () => openModal('alertModal2'));
+            document.getElementById('arrowTrigger').addEventListener('click', () => openModal('alertModal'));
+
+            // Cerrar modales
+            document.querySelectorAll('.closeModalBtn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
+                });
+            });
+
+            document.querySelectorAll('.modal-overlay').forEach(modal => {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) modal.classList.remove('active');
+                });
+            });
+
+            // Navegación móvil
+            const btnLeft = document.getElementById('btnScrollLeft');
+            const btnRight = document.getElementById('btnScrollRight');
+            const getScrollAmount = () => window.innerWidth * 0.7;
+
+            btnLeft.addEventListener('click', () => window.scrollBy({ left: -getScrollAmount(), behavior: 'smooth' }));
+            btnRight.addEventListener('click', () => window.scrollBy({ left: getScrollAmount(), behavior: 'smooth' }));
+        });
+    </script>
+</body>
+</html>
