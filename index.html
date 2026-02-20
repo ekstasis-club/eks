@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EKS.TA.SIS</title>
+    
+    <link href="https://fonts.cdnfonts.com/css/pricedown" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --gta-orange: #FFAB00;
+            --gta-pink: #FF69B4; 
+            --neon-pink: #FF2F92;
+            --gta-dark: #000000;
+            --hud-bg: rgba(0, 0, 0, 0.7);
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+            background-color: var(--gta-dark);
+        }
+
+        .gta-font {
+            font-family: 'Pricedown', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .title-underground {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.6rem;
+            letter-spacing: 0.35rem;
+            color: var(--neon-pink);
+            text-transform: uppercase;
+            text-shadow:
+                0 0 10px rgba(255,47,146,0.6),
+                0 0 25px rgba(255,47,146,0.9),
+                0 0 45px rgba(255,47,146,1);
+            animation: pulse 2s infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.85; }
+            50% { opacity: 1; }
+            100% { opacity: 0.85; }
+        }
+
+        p {
+            letter-spacing: 3px;
+            opacity: 0.7;
+            margin-bottom: 1.8rem;
+        }
+
+        .password-input {
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--neon-pink);
+            color: white;
+            padding: 12px 15px;
+            font-size: 1.4rem;
+            text-align: center;
+            width: 100px;
+            border-radius: 4px;
+            letter-spacing: 5px;
+            outline: none;
+            box-shadow: inset 0 0 10px rgba(255, 47, 146, 0.2);
+            transition: all 0.3s;
+        }
+
+        .password-input:focus {
+            box-shadow: 0 0 20px var(--neon-pink);
+            background: rgba(255, 47, 146, 0.1);
+        }
+
+        .password-input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .main-container {
+            position: relative;
+            width: 100%;
+            height: 110vh;
+            background-image: url('image_1.png'); 
+            background-size: cover;
+            background-position: center;
+            background-color: #050505;
+        }
+
+        .smoke-container {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            overflow: hidden; z-index: 5; pointer-events: none;
+        }
+
+       .smoke-particle {
+            position: absolute;
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0) 70%);
+            border-radius: 50%; filter: blur(30px); opacity: 0;
+            animation: smokeMove 20s infinite linear;
+        }
+
+        .s1 { top: 20%; left: 110%; animation-delay: 0s; width: 800px; }
+        .s2 { top: 50%; left: 110%; animation-delay: 2s; width: 600px; }
+        .s3 { top: -10%; left: 110%; animation-delay: 4s; width: 900px; }
+        .s4 { top: 70%; left: 110%; animation-delay: 7s; width: 700px; }
+
+        @keyframes smokeMove {
+            0% { transform: translateX(0) scale(1); opacity: 0; }
+            2% { opacity: 0.8; }
+            90% { opacity: 0.8; }
+            100% { transform: translateX(-150vw) scale(1.5); opacity: 0; }
+        }
+
+        .flash-effect {
+            position: fixed; inset: 0; background: white; opacity: 0; z-index: 200; pointer-events: none;
+        }
+        .flash-active { animation: flashAnim 0.4s ease-out; }
+        @keyframes flashAnim {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .fog-burst {
+            position: absolute; top: 80%; left: 46%; width: 20px; height: 20px;
+            background: radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0) 70%);
+            border-radius: 50%; filter: blur(15px); z-index: 60; pointer-events: none;
+            opacity: 0; transform: translate(-50%, -50%);
+        }
+        .burst-active { animation: fogBurstAnim 0.8s cubic-bezier(0.165, 0.84, 0.44, 1); }
+        @keyframes fogBurstAnim {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(70); opacity: 0; }
+        }
+
+        .strobe {
+            position: absolute; inset: 0; background: rgba(255,255,255,0.85);
+            animation: strobe 4s infinite; pointer-events: none; z-index: 30; mix-blend-mode: overlay;
+        }
+
+        @keyframes strobe {
+            0%, 92%, 100% { opacity: 0; }
+            93% { opacity: 1; }
+            94% { opacity: 0; }
+            95% { opacity: 1; }
+            96% { opacity: 0; }
+        }
+
+        .spotlight {
+            position: absolute; top: -18vh; width: 60vw; height: 150vh;
+            background: linear-gradient(to bottom, rgba(255,47,146,0.3), rgba(255,47,146,0));
+            clip-path: polygon(50% 0, 100% 100%, 0 100%);
+            filter: blur(35px); opacity: 0.55; z-index: 2;
+            animation: swing 4s infinite alternate ease-in-out; pointer-events: none;
+        }
+
+        .spotlight.left { left: -18%; }
+        .spotlight.right { right: -18%; animation-duration: 5s; }
+
+        @keyframes swing {
+            from { transform: rotate(-12deg); }
+            to { transform: rotate(12deg); }
+        }
+
+        .hud-element {
+            position: absolute; padding: 10px 15px; background: var(--hud-bg);
+            color: white; border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px; text-shadow: 1px 1px 2px black; z-index: 40;
+        }
+
+        .hud-top-right { top: 20px; right: 20px; display: flex; flex-direction: column; align-items: flex-end; }
+        .countdown-label { font-size: 1rem; color: white; margin-bottom: 5px; }
+        #countdown { font-size: 1.2rem; color: var(--gta-pink); font-weight: bold; }
+        
+        .door-trigger-area {
+            position: absolute; top: 80%; left: 46%; transform: translate(-50%, -50%);
+            width: 100px; height: 150px; cursor: pointer; z-index: 50;
+        }
+
+        .mission-marker {
+            position: absolute; bottom: 0; left: 50%; transform: translateX(-50%) rotateX(60deg);
+            width: 120px; height: 120px; border-radius: 50%;
+            background: rgba(255, 105, 180, 0.4); border: 4px solid var(--gta-pink);
+            animation: pulse-marker 1.5s infinite; pointer-events: none;
+        }
+
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8); display: flex; justify-content: center;
+            align-items: center; z-index: 300; opacity: 0; pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: all; }
+
+        .gta-alert-box {
+            background: linear-gradient(to bottom, #1a1a1a, #000);
+            border: 4px solid var(--neon-pink); width: 90%; max-width: 600px;
+            text-align: center; transform: scale(0.8);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.3s, box-shadow 0.3s;
+            box-shadow: 0 0 30px rgba(255, 47, 146, 0.4);
+            padding-bottom: 20px;
+        }
+        .modal-overlay.active .gta-alert-box { transform: scale(1); }
+
+        .alert-header { 
+            background: var(--neon-pink); 
+            color: black; 
+            padding: 10px; 
+            font-size: 2rem; 
+            transition: background 0.3s, color 0.3s;
+        }
+        .alert-body { padding: 30px 10px; color: white; }
+
+        .gta-alert-box.error {
+            border-color: #ff0000;
+            box-shadow: 0 0 40px rgba(255, 0, 0, 0.8);
+            animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        .gta-alert-box.error .alert-header {
+            background: #ff0000;
+            color: white;
+            text-shadow: 0 0 5px black;
+        }
+        .gta-alert-box.error .password-input {
+            border-color: #ff0000;
+            box-shadow: inset 0 0 10px rgba(255, 0, 0, 0.4);
+            color: #ff0000;
+            background: rgba(255, 0, 0, 0.1);
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: scale(1) translate3d(-2px, 0, 0); }
+            20%, 80% { transform: scale(1) translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: scale(1) translate3d(-6px, 0, 0); }
+            40%, 60% { transform: scale(1) translate3d(6px, 0, 0); }
+        }
+
+        @keyframes pulse-marker {
+            0% { box-shadow: 0 0 0 0 rgba(255, 105, 180, 0.7); }
+            70% { box-shadow: 0 0 0 20px rgba(255, 105, 180, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 105, 180, 0); }
+        }
+
+        .main-container::after {
+            content: ""; position: absolute; inset: 0; z-index: 15; pointer-events: none;
+            backdrop-filter: blur(35px) saturate(0.4) contrast(0.7);
+            background: rgba(0, 0, 0, 0.35); transition: backdrop-filter 2.5s ease, background 2.5s ease;
+        }
+        .main-container.revealed::after { backdrop-filter: none; background: rgba(255, 47, 146, 0); }
+
+        .mission-marker { display: none; }
+        .door-trigger-area { pointer-events: none; }
+
+        @keyframes markerReveal {
+            0% { opacity: 0; transform: translateX(-50%) scale(0.4); box-shadow: 0 0 0 rgba(255, 105, 180, 0); }
+            60% { opacity: 1; transform: translateX(-50%) scale(1.15); box-shadow: 0 0 35px rgba(255, 105, 180, 0.9); }
+            100% { transform: translateX(-50%) scale(1); box-shadow: 0 0 25px rgba(255, 105, 180, 0.6); }
+        }
+
+        .main-container.activated .mission-marker { display: block; animation: markerReveal 0.9s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .main-container.activated .door-trigger-area { pointer-events: auto; }
+    </style>
+</head>
+<body>
+
+    <div id="screenFlash" class="flash-effect"></div>
+    <div id="fogBurst" class="fog-burst"></div>
+
+    <audio id="openSound" src="https://assets.mixkit.co/active_storage/sfx/2570/2570-preview.m4a"></audio>
+    <audio id="alertSound" src="https://assets.mixkit.co/active_storage/sfx/2866/2866-preview.m4a"></audio>
+
+    <div class="main-container">
+        <div class="smoke-container">
+            <div class="smoke-particle s1"></div>
+            <div class="smoke-particle s2"></div>
+            <div class="smoke-particle s3"></div>
+            <div class="smoke-particle s4"></div>
+        </div>
+
+        <div class="spotlight left"></div>
+        <div class="spotlight right"></div>
+        <div class="strobe"></div>
+
+        <div class="hud-element hud-top-right">
+            <span class="gta-font countdown-label">MÁS INFO:</span>
+            <span class="gta-font" id="countdown">Cargando...</span>
+        </div>
+
+        <div class="door-trigger-area" id="clubDoor">
+            <div class="mission-marker"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="alertModal">
+        <div class="gta-alert-box" id="gtaAlertBox">
+            <div class="gta-font alert-header">ALERTA</div>
+            <div class="alert-body">
+                <h2 class="title-underground">EKS.TA.SIS VUELVE</h2>
+                <p>La warehouse se nos ha quedado pequeña.<br />Más información pronto.</p>
+                
+                <div style="display: flex; justify-content: center; align-items: center;">
+                    <input type="password" id="secretCode" class="password-input" placeholder="•••" maxlength="3" autocomplete="off">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const door = document.getElementById('clubDoor');
+            const modal = document.getElementById('alertModal');
+            const alertBox = document.getElementById('gtaAlertBox');
+            const secretInput = document.getElementById('secretCode');
+            const flash = document.getElementById('screenFlash');
+            const burst = document.getElementById('fogBurst');
+            
+            const openSound = document.getElementById('openSound');
+            const alertSound = document.getElementById('alertSound');
+            const countdownElement = document.getElementById('countdown');
+
+            let targetDate = new Date(Date.now() + 10000);
+
+            function updateCountdown() {
+                const now = new Date().getTime();
+                const distance = targetDate.getTime() - now;
+                if (distance < 0) {
+                    countdownElement.innerHTML = "SEE U SOON!";
+                    const container = document.querySelector('.main-container');
+                    container.classList.add('revealed');
+                    container.classList.add('activated');
+                    return;
+                }
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                countdownElement.innerHTML = `${days}D : ${hours.toString().padStart(2, '0')}H : ${minutes.toString().padStart(2, '0')}M : ${seconds.toString().padStart(2, '0')}S`;
+            }
+
+            setInterval(updateCountdown, 1000);
+            updateCountdown();
+
+            door.addEventListener('click', () => {
+                openSound.play().catch(() => {});
+                setTimeout(() => alertSound.play().catch(() => {}), 300);
+
+                flash.classList.remove('flash-active');
+                void flash.offsetWidth; 
+                flash.classList.add('flash-active');
+
+                burst.classList.remove('burst-active');
+                void burst.offsetWidth; 
+                burst.classList.add('burst-active');
+
+                modal.classList.add('active');
+                setTimeout(() => secretInput.focus(), 100);
+            });
+
+            // --- LÓGICA DEL CÓDIGO ACTUALIZADA ---
+            secretInput.addEventListener('input', (e) => {
+                alertBox.classList.remove('error');
+                const val = e.target.value;
+                
+                if (val.length === 3) {
+                    if (val === '000') {
+                        // CÓDIGO CORRECTO: Efecto fade-out y carga de la nueva página
+                        document.body.style.transition = "opacity 0.8s ease-in-out";
+                        document.body.style.opacity = "0";
+                        
+                        setTimeout(() => {
+                            window.location.href = 'mapa.html'; // Aquí enlaza con tu segundo archivo
+                        }, 800);
+
+                    } else {
+                        // CÓDIGO INCORRECTO: Poner en rojo y temblar
+                        alertBox.classList.add('error');
+                        setTimeout(() => {
+                            secretInput.value = '';
+                            alertBox.classList.remove('error');
+                        }, 800);
+                    }
+                }
+            });
+
+            function closeModal() {
+                modal.classList.remove('active');
+                secretInput.value = ''; 
+                alertBox.classList.remove('error');
+            }
+
+            modal.addEventListener('click', (e) => { 
+                if (e.target === modal) closeModal(); 
+            });
+        });
+    </script>
+</body>
+</html>
