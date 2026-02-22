@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>EKS.TA.SIS</title>
     
     <link href="https://fonts.cdnfonts.com/css/pricedown" rel="stylesheet">
@@ -18,12 +18,25 @@
             --hud-bg: rgba(0, 0, 0, 0.7);
         }
 
+        /* Bloqueo estricto total en el body/html */
         body, html {
             margin: 0;
             padding: 0;
             height: 100%;
+            width: 100%;
             font-family: 'Arial', sans-serif;
             background-color: var(--gta-dark);
+            overflow: hidden; /* Ni vertical ni horizontal aquí */
+        }
+
+        /* NUEVO: Contenedor específico para manejar el scroll horizontal */
+        #scroll-container {
+            width: 100vw;
+            height: 100vh;
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch; /* Scroll suave nativo en iOS */
+            scroll-behavior: smooth;
         }
 
         .gta-font {
@@ -58,46 +71,16 @@
             margin-bottom: 1.8rem;
         }
 
-        .password-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px solid var(--neon-pink);
-            color: white;
-            padding: 12px 25px;
-            font-size: 1.4rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 15px;
-            border-radius: 4px;
-            letter-spacing: 5px;
-            box-shadow: inset 0 0 10px rgba(255, 47, 146, 0.2);
-        }
-
-        .password-btn:hover {
-            background: var(--neon-pink);
-            color: black;
-            box-shadow: 0 0 20px var(--neon-pink);
-        }
-
-        .dots {
-            font-size: 1.8rem;
-            line-height: 0;
-            position: relative;
-            top: -2px;
-        }
-
         .main-container {
             position: relative;
             min-width: 1200px; 
-            min-height: 100vh;
-            aspect-ratio: 16 / 9; 
+            height: 100%;
             background-image: url('image_2.png');
-            background-size: 100% 100%;
+            background-size: cover;
             background-position: center;
             background-color: #050505;
             overflow: hidden;
-            margin: 0 auto; 
+            margin: 0; 
         }
 
         /* --- EFECTOS AMBIENTALES --- */
@@ -115,7 +98,6 @@
             animation: smokeMove 20s infinite linear;
         }
 
-        /* Modificado con retrasos negativos para que el humo esté visible desde el inicio */
         .s1 { top: 20%; left: 110%; animation-delay: -15s; width: 800px; }
         .s2 { top: 50%; left: 110%; animation-delay: -8s; width: 600px; }
         .s3 { top: -10%; left: 110%; animation-delay: -18s; width: 900px; }
@@ -181,8 +163,7 @@
         /* --- FLECHAS (MARKERS) --- */
         .mission-marker {
             position: absolute;
-            width: 40px;
-            height: 60px;
+            width: 40px; height: 60px;
             background: var(--neon-pink);
             clip-path: polygon(50% 100%, 100% 60%, 70% 60%, 70% 0%, 30% 0%, 30% 60%, 0% 60%);
             animation: pulse-marker 1.5s infinite;
@@ -190,35 +171,20 @@
             z-index: 100;
         }
 
-        /* Flecha Derecha */
-        .marker-right { 
-            top: 52%; left: 90%; 
-            transform: translate(-50%, -50%) rotate(-90deg);
-            animation: pulse-marker-right 1.5s infinite; 
-        }
-
-        /* Flecha Centro */
+        .marker-right { top: 52%; left: 90%; transform: translate(-50%, -50%) rotate(-90deg); animation: pulse-marker-right 1.5s infinite; }
         .marker-center { top: 40%; left: 53%; transform: translate(-50%, -50%); }
-
-        /* Flecha Izquierda */
-        .marker-left { 
-            top: 46%; left: 18%; 
-            transform: translate(-50%, -50%) rotate(180deg);
-            animation: pulse-marker-up 1.5s infinite;
-        }
+        .marker-left { top: 46%; left: 18%; transform: translate(-50%, -50%) rotate(180deg); animation: pulse-marker-up 1.5s infinite; }
 
         @keyframes pulse-marker {
             0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
             50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.8; }
             100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
         }
-
         @keyframes pulse-marker-up {
             0% { transform: translate(-50%, -50%) rotate(180deg) scale(1); opacity: 1; }
             50% { transform: translate(-50%, -50%) rotate(180deg) scale(1.2); opacity: 0.8; }
             100% { transform: translate(-50%, -50%) rotate(180deg) scale(1); opacity: 1; }
         }
-
         @keyframes pulse-marker-right {
             0% { transform: translate(-50%, -50%) rotate(-90deg) scale(1); opacity: 1; }
             50% { transform: translate(-50%, -50%) rotate(-90deg) scale(1.2); opacity: 0.8; }
@@ -243,8 +209,6 @@
             padding-bottom: 20px;
         }
         .modal-overlay.active .gta-alert-box { transform: scale(1); }
-
-        .alert-header { background: var(--neon-pink); color: black; padding: 10px; font-size: 2rem; }
         .alert-body { padding: 30px 10px; color: white; }
 
         /* --- CONTROLES MÓVIL --- */
@@ -262,37 +226,25 @@
             background: rgba(0, 0, 0, 0.7);
             border: 2px solid var(--neon-pink);
             color: var(--neon-pink);
-            width: 55px;
-            height: 55px;
+            width: 55px; height: 55px;
             border-radius: 50%;
             font-size: 1.5rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            display: flex; justify-content: center; align-items: center;
             cursor: pointer;
             box-shadow: 0 0 15px rgba(255, 47, 146, 0.3);
             transition: all 0.2s ease;
             -webkit-tap-highlight-color: transparent; 
         }
 
-        /* --- MEDIA QUERIES --- */
         @media (min-width: 769px) { 
             .mobile-nav-controls { display: none; } 
         }
 
-        /* Modificado para adaptar las luces en la versión móvil */
         @media (max-width: 768px) {
-            .spotlight {
-                width: 100vw; 
-            }
-            .spotlight.left { 
-                left: 25%; 
-            }
-            .spotlight.right { 
-                right: 25%; 
-            }
+            .spotlight { width: 100vw; }
+            .spotlight.left { left: 25%; }
+            .spotlight.right { right: 25%; }
         }
-
     </style>
 </head>
 <body>
@@ -303,21 +255,23 @@
     <audio id="openSound" src="https://assets.mixkit.co/active_storage/sfx/2570/2570-preview.m4a"></audio>
     <audio id="alertSound" src="https://assets.mixkit.co/active_storage/sfx/2866/2866-preview.m4a"></audio>
 
-    <div class="main-container">
-        <div class="smoke-container">
-            <div class="smoke-particle s1"></div>
-            <div class="smoke-particle s2"></div>
-            <div class="smoke-particle s3"></div>
-            <div class="smoke-particle s4"></div>
+    <div id="scroll-container">
+        <div class="main-container">
+            <div class="smoke-container">
+                <div class="smoke-particle s1"></div>
+                <div class="smoke-particle s2"></div>
+                <div class="smoke-particle s3"></div>
+                <div class="smoke-particle s4"></div>
+            </div>
+
+            <div class="spotlight left"></div>
+            <div class="spotlight right"></div>
+            <div class="strobe"></div>
+
+            <div id="arrowLeft" class="mission-marker marker-left"></div>
+            <div id="arrowCenter" class="mission-marker marker-center"></div>
+            <div id="arrowTrigger" class="mission-marker marker-right"></div>
         </div>
-
-        <div class="spotlight left"></div>
-        <div class="spotlight right"></div>
-        <div class="strobe"></div>
-
-        <div id="arrowLeft" class="mission-marker marker-left"></div>
-        <div id="arrowCenter" class="mission-marker marker-center"></div>
-        <div id="arrowTrigger" class="mission-marker marker-right"></div>
     </div>
 
     <div class="mobile-nav-controls">
@@ -330,9 +284,6 @@
             <div class="alert-body">
                 <h2 class="title-underground">POPUP STORES</h2>
                 <p>Nuevo escenario, buena música, pero queríamos ir más allá....<br />Traemos a la pista las marcas emergentes con más rollo de la escena.</p>
-                <!--<button class="password-btn closeModalBtn">
-                    <i class="fas fa-lock"></i>
-                </button>-->
             </div>
         </div>
     </div>
@@ -342,10 +293,6 @@
             <div class="alert-body">
                 <h2 class="title-underground">STAGE DESIGN</h2>
                 <p>Nuestra producción más ambiciosa hasta la fecha.<br />Prepárate para alcanzar el verdadero ekstasis.</p>
-                <!--<button class="password-btn closeModalBtn">
-                    <span class="dots">••••</span>
-                    <i class="fas fa-check"></i>
-                </button>-->
             </div>
         </div>
     </div>
@@ -354,25 +301,23 @@
         <div class="gta-alert-box">
             <div class="alert-body">
                 <h2 class="title-underground">LINE UP REVEAL</h2>
-                <p>Fieles a nuestra esencia, apostamos por el talento nacional y local.<br />Prepárate para un viaje entre géneros con B2B irrepetibles.</p>
-                <!--<button class="password-btn closeModalBtn">
-                    <span class="dots">••••</span>
-                    <i class="fas fa-skull"></i>
-                </button>-->
+                <p>Fieles a nuestra esencia, apostamos por el talento nacional y local. Prepárate para un viaje entre géneros con B2B irrepetibles.</p>
             </div>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // Referencia al nuevo contenedor de scroll
+            const scrollContainer = document.getElementById('scroll-container');
+
+            // Centrado horizontal inicial
             const centerContent = () => {
-                const scrollX = (document.documentElement.scrollWidth - window.innerWidth) / 2;
-                const scrollY = (document.documentElement.scrollHeight - window.innerHeight) / 2;
-                window.scrollTo(scrollX, scrollY);
+                const scrollX = (scrollContainer.scrollWidth - window.innerWidth) / 2;
+                scrollContainer.scrollTo(scrollX, 0);
             };
 
             centerContent();
-            setTimeout(() => { document.documentElement.style.scrollBehavior = "smooth"; }, 100);
 
             const flash = document.getElementById('screenFlash');
             const burst = document.getElementById('fogBurst');
@@ -382,29 +327,18 @@
             const openModal = (modalId) => {
                 openSound.play().catch(() => {});
                 setTimeout(() => alertSound.play().catch(() => {}), 300);
-
                 flash.classList.remove('flash-active');
                 void flash.offsetWidth; 
                 flash.classList.add('flash-active');
-
                 burst.classList.remove('burst-active');
                 void burst.offsetWidth; 
                 burst.classList.add('burst-active');
-
                 document.getElementById(modalId).classList.add('active');
             };
 
-            // Click Flechas
             document.getElementById('arrowLeft').addEventListener('click', () => openModal('alertModal3'));
             document.getElementById('arrowCenter').addEventListener('click', () => openModal('alertModal2'));
             document.getElementById('arrowTrigger').addEventListener('click', () => openModal('alertModal'));
-
-            // Cerrar modales
-            document.querySelectorAll('.closeModalBtn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
-                });
-            });
 
             document.querySelectorAll('.modal-overlay').forEach(modal => {
                 modal.addEventListener('click', (e) => {
@@ -412,13 +346,31 @@
                 });
             });
 
-            // Navegación móvil
+            // LÓGICA DE NAVEGACIÓN MÓVIL CORREGIDA
             const btnLeft = document.getElementById('btnScrollLeft');
             const btnRight = document.getElementById('btnScrollRight');
-            const getScrollAmount = () => window.innerWidth * 0.7;
+            
+            const moveScroll = (direction) => {
+                const amount = window.innerWidth * 0.7; 
+                const target = direction === 'left' ? -amount : amount;
+                
+                // Forzamos el scroll en el contenedor específico, NO en window
+                scrollContainer.scrollBy({
+                    left: target,
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            };
 
-            btnLeft.addEventListener('click', () => window.scrollBy({ left: -getScrollAmount(), behavior: 'smooth' }));
-            btnRight.addEventListener('click', () => window.scrollBy({ left: getScrollAmount(), behavior: 'smooth' }));
+            btnLeft.addEventListener('click', (e) => {
+                e.preventDefault();
+                moveScroll('left');
+            });
+
+            btnRight.addEventListener('click', (e) => {
+                e.preventDefault();
+                moveScroll('right');
+            });
         });
     </script>
 </body>

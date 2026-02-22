@@ -28,6 +28,20 @@
             background-color: var(--gta-dark);
         }
 
+        /* EFECTO SACUDIDA */
+        @keyframes screenShake {
+            0% { transform: translate(0,0); }
+            10% { transform: translate(-5px, -5px); }
+            20% { transform: translate(5px, 5px); }
+            30% { transform: translate(-5px, 5px); }
+            40% { transform: translate(5px, -5px); }
+            100% { transform: translate(0,0); }
+        }
+
+        .shake-active {
+            animation: screenShake 0.1s infinite;
+        }
+
         .scroll-wrapper {
             position: absolute;
             inset: 0;
@@ -110,7 +124,7 @@
             background-color: #050505;
         }
 
-        /* --- HUMO (Oculto inicialmente) --- */
+        /* --- HUMO --- */
         .smoke-container {
             position: fixed;
             inset: 0;
@@ -121,7 +135,7 @@
             transition: opacity 2.5s ease;
         }
         
-        body.revealed .smoke-container {
+        body.revealed .smoke-container, body.smoke-active .smoke-container {
             opacity: 1;
         }
 
@@ -147,7 +161,7 @@
 
         /* --- EFECTOS VISUALES --- */
         .flash-effect {
-            position: fixed; inset: 0; background: white; opacity: 0; z-index: 200; pointer-events: none;
+            position: fixed; inset: 0; background: white; opacity: 0; z-index: 1000; pointer-events: none;
         }
         .flash-active { animation: flashAnim 0.4s ease-out; }
         @keyframes flashAnim {
@@ -170,7 +184,6 @@
             100% { transform: translate(-50%, -50%) scale(70); opacity: 0; }
         }
 
-        /* ESTROBO (Oculto inicialmente) */
         .strobe {
             position: fixed; inset: 0; background: rgba(255,255,255,0.85);
             pointer-events: none; z-index: 30; mix-blend-mode: overlay;
@@ -189,7 +202,6 @@
             96% { opacity: 0; }
         }
 
-        /* LUCES (Ocultas inicialmente) */
         .spotlight {
             position: fixed; 
             top: -10vh; 
@@ -198,16 +210,16 @@
             background: linear-gradient(to bottom, rgba(255,47,146,0.3), rgba(255,47,146,0));
             clip-path: polygon(50% 0, 100% 100%, 0 100%);
             filter: blur(35px); 
-            opacity: 0; /* Cambio aquí */
+            opacity: 0; 
             z-index: 20;
             animation: swing 4s infinite alternate ease-in-out; 
             pointer-events: none;
             transform-origin: top center;
-            transition: opacity 2.5s ease; /* Entrada suave junto con el blur del fondo */
+            transition: opacity 2.5s ease; 
         }
 
         body.revealed .spotlight {
-            opacity: 0.55; /* Aparecen al revelar */
+            opacity: 0.55; 
         }
 
         .spotlight.left { left: -15vw; }
@@ -237,7 +249,8 @@
             transform: translateX(-50%);
             width: 200px; 
             height: 100px; 
-            cursor: pointer; 
+            cursor: default; 
+            pointer-events: none;
             z-index: 50;
             display: flex;
             justify-content: center;
@@ -315,7 +328,11 @@
             display: block; 
             animation: markerReveal 0.9s cubic-bezier(0.175, 0.885, 0.32, 1.275), pulse-marker 1.5s infinite 0.9s ease-in-out; 
         }
-        .scroll-wrapper.activated .door-trigger-area { pointer-events: auto; }
+        
+        .scroll-wrapper.activated .door-trigger-area { 
+            pointer-events: auto; 
+            cursor: pointer;
+        }
 
         @keyframes markerReveal {
             0% { opacity: 0; transform: scale(0.1); }
@@ -348,7 +365,7 @@
     <audio id="alertSound" src="https://assets.mixkit.co/active_storage/sfx/2866/2866-preview.m4a"></audio>
 
     <div class="scroll-wrapper" id="scroller">
-        <div class="main-container">
+        <div class="main-container" id="containerToShake">
             <div class="door-trigger-area" id="clubDoor">
                 <div class="mission-marker"></div>
             </div>
@@ -370,17 +387,24 @@
     </div>
 
     <script>
-        // Lógica de centrado
         const scroller = document.getElementById('scroller');
+        const containerToShake = document.getElementById('containerToShake');
+        
         function centerImage() {
             if (scroller && scroller.scrollWidth > scroller.clientWidth) {
                 scroller.scrollLeft = (scroller.scrollWidth - scroller.clientWidth) / 2;
             }
         }
 
+        let isPageFullyLoaded = false;
         centerImage();
         document.addEventListener('DOMContentLoaded', centerImage);
-        window.addEventListener('load', centerImage);
+        
+        window.addEventListener('load', () => {
+            centerImage();
+            isPageFullyLoaded = true;
+        });
+        
         window.addEventListener('resize', centerImage);
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -405,7 +429,6 @@
                     countdownElement.innerHTML = "SEE U SOON!";
                     scroller.classList.add('revealed');
                     scroller.classList.add('activated');
-                    // MODIFICACIÓN: Añadimos la clase al body para encender las luces
                     document.body.classList.add('revealed'); 
                     return;
                 }
@@ -420,6 +443,8 @@
             updateCountdown();
 
             door.addEventListener('click', () => {
+                if (!isPageFullyLoaded) return;
+
                 openSound.play().catch(() => {});
                 setTimeout(() => alertSound.play().catch(() => {}), 300);
 
@@ -441,11 +466,34 @@
                 
                 if (val.length === 3) {
                     if (val === '000') {
-                        document.body.style.transition = "opacity 0.8s ease-in-out";
-                        document.body.style.opacity = "0";
+                        // --- EFECTO DE ÉXITO ---
+                        // 1. Sonido de confirmación (puedes reusar openSound o alertSound)
+                        openSound.currentTime = 0;
+                        openSound.play().catch(() => {});
+                        
+                        // 2. Destello blanco intenso
+                        flash.classList.remove('flash-active');
+                        void flash.offsetWidth;
+                        flash.classList.add('flash-active');
+                        
+                        // 3. Sacudida de pantalla y humo
+                        document.body.classList.add('smoke-active');
+                        containerToShake.classList.add('shake-active');
+                        
+                        // 4. Bloquear el input para que no sigan escribiendo
+                        secretInput.disabled = true;
+
+                        // 5. Transición final
                         setTimeout(() => {
-                            window.location.href = 'mapa.html'; 
-                        }, 800);
+                            document.body.style.transition = "opacity 1.2s ease-in-out, filter 1.2s ease";
+                            document.body.style.opacity = "0";
+                            document.body.style.filter = "brightness(2)"; // Efecto de quemado blanco
+                            
+                            setTimeout(() => {
+                                window.location.href = 'mapa.html'; 
+                            }, 1200);
+                        }, 600); 
+
                     } else {
                         alertBox.classList.add('error');
                         setTimeout(() => {
