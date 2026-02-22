@@ -21,10 +21,26 @@
         body, html {
             margin: 0;
             padding: 0;
+            width: 100%;
             height: 100%;
             overflow: hidden;
             font-family: 'Arial', sans-serif;
             background-color: var(--gta-dark);
+        }
+
+        .scroll-wrapper {
+            position: absolute;
+            inset: 0;
+            overflow-x: auto;
+            overflow-y: hidden;
+            overscroll-behavior-x: none;
+            scrollbar-width: none; 
+            -ms-overflow-style: none;
+            z-index: 1;
+        }
+
+        .scroll-wrapper::-webkit-scrollbar {
+            display: none;
         }
 
         .gta-font {
@@ -85,18 +101,28 @@
 
         .main-container {
             position: relative;
-            width: 100%;
-            height: 110vh;
+            height: 100vh;
+            height: 100dvh; 
+            width: max(100vw, 177.77vh); 
             background-image: url('image_1.png'); 
             background-size: cover;
             background-position: center;
             background-color: #050505;
         }
 
+        /* --- HUMO (Oculto inicialmente) --- */
         .smoke-container {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            overflow: hidden; z-index: 5; pointer-events: none;
+            position: fixed;
+            inset: 0;
+            overflow: hidden; 
+            z-index: 10; 
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 2.5s ease;
+        }
+        
+        body.revealed .smoke-container {
+            opacity: 1;
         }
 
        .smoke-particle {
@@ -119,6 +145,7 @@
             100% { transform: translateX(-150vw) scale(1.5); opacity: 0; }
         }
 
+        /* --- EFECTOS VISUALES --- */
         .flash-effect {
             position: fixed; inset: 0; background: white; opacity: 0; z-index: 200; pointer-events: none;
         }
@@ -129,7 +156,10 @@
         }
 
         .fog-burst {
-            position: absolute; top: 80%; left: 46%; width: 20px; height: 20px;
+            position: fixed; 
+            bottom: 10%; 
+            left: 50%; 
+            width: 20px; height: 20px;
             background: radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0) 70%);
             border-radius: 50%; filter: blur(15px); z-index: 60; pointer-events: none;
             opacity: 0; transform: translate(-50%, -50%);
@@ -140,9 +170,15 @@
             100% { transform: translate(-50%, -50%) scale(70); opacity: 0; }
         }
 
+        /* ESTROBO (Oculto inicialmente) */
         .strobe {
-            position: absolute; inset: 0; background: rgba(255,255,255,0.85);
-            animation: strobe 4s infinite; pointer-events: none; z-index: 30; mix-blend-mode: overlay;
+            position: fixed; inset: 0; background: rgba(255,255,255,0.85);
+            pointer-events: none; z-index: 30; mix-blend-mode: overlay;
+            opacity: 0;
+        }
+
+        body.revealed .strobe {
+            animation: strobe 4s infinite;
         }
 
         @keyframes strobe {
@@ -153,44 +189,80 @@
             96% { opacity: 0; }
         }
 
+        /* LUCES (Ocultas inicialmente) */
         .spotlight {
-            position: absolute; top: -18vh; width: 60vw; height: 150vh;
+            position: fixed; 
+            top: -10vh; 
+            width: 50vw; 
+            height: 120vh;
             background: linear-gradient(to bottom, rgba(255,47,146,0.3), rgba(255,47,146,0));
             clip-path: polygon(50% 0, 100% 100%, 0 100%);
-            filter: blur(35px); opacity: 0.55; z-index: 2;
-            animation: swing 4s infinite alternate ease-in-out; pointer-events: none;
+            filter: blur(35px); 
+            opacity: 0; /* Cambio aquí */
+            z-index: 20;
+            animation: swing 4s infinite alternate ease-in-out; 
+            pointer-events: none;
+            transform-origin: top center;
+            transition: opacity 2.5s ease; /* Entrada suave junto con el blur del fondo */
         }
 
-        .spotlight.left { left: -18%; }
-        .spotlight.right { right: -18%; animation-duration: 5s; }
+        body.revealed .spotlight {
+            opacity: 0.55; /* Aparecen al revelar */
+        }
+
+        .spotlight.left { left: -15vw; }
+        .spotlight.right { right: -15vw; animation-duration: 5s; }
 
         @keyframes swing {
             from { transform: rotate(-12deg); }
             to { transform: rotate(12deg); }
         }
 
+        /* --- HUD --- */
         .hud-element {
-            position: absolute; padding: 10px 15px; background: var(--hud-bg);
+            position: fixed; padding: 10px 15px; background: var(--hud-bg);
             color: white; border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 5px; text-shadow: 1px 1px 2px black; z-index: 40;
+            border-radius: 5px; text-shadow: 1px 1px 2px black; z-index: 100;
         }
 
         .hud-top-right { top: 20px; right: 20px; display: flex; flex-direction: column; align-items: flex-end; }
         .countdown-label { font-size: 1rem; color: white; margin-bottom: 5px; }
         #countdown { font-size: 1.2rem; color: var(--gta-pink); font-weight: bold; }
         
+        /* --- CÍRCULO VERTICAL --- */
         .door-trigger-area {
-            position: absolute; top: 80%; left: 46%; transform: translate(-50%, -50%);
-            width: 100px; height: 150px; cursor: pointer; z-index: 50;
+            position: absolute; 
+            bottom: 28%; 
+            left: 44%; 
+            transform: translateX(-50%);
+            width: 200px; 
+            height: 100px; 
+            cursor: pointer; 
+            z-index: 50;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .mission-marker {
-            position: absolute; bottom: 0; left: 50%; transform: translateX(-50%) rotateX(60deg);
-            width: 120px; height: 120px; border-radius: 50%;
-            background: rgba(255, 105, 180, 0.4); border: 4px solid var(--gta-pink);
-            animation: pulse-marker 1.5s infinite; pointer-events: none;
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle, rgba(255, 47, 146, 0.4) 0%, rgba(255, 47, 146, 0) 70%);
+            border: 6px solid var(--neon-pink);
+            border-radius: 50%;
+            box-shadow: 0 0 20px var(--neon-pink), inset 0 0 20px var(--neon-pink);
+            animation: pulse-marker 1.5s infinite ease-in-out;
+            pointer-events: none;
+            display: none; 
         }
 
+        @keyframes pulse-marker {
+            0% { transform: scale(0.9); opacity: 0.7; box-shadow: 0 0 10px var(--neon-pink); }
+            50% { transform: scale(1.1); opacity: 1; box-shadow: 0 0 30px var(--neon-pink); }
+            100% { transform: scale(0.9); opacity: 0.7; box-shadow: 0 0 10px var(--neon-pink); }
+        }
+
+        /* --- MODAL Y ALERTAS --- */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.8); display: flex; justify-content: center;
@@ -214,7 +286,6 @@
             color: black; 
             padding: 10px; 
             font-size: 2rem; 
-            transition: background 0.3s, color 0.3s;
         }
         .alert-body { padding: 30px 10px; color: white; }
 
@@ -223,17 +294,7 @@
             box-shadow: 0 0 40px rgba(255, 0, 0, 0.8);
             animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
         }
-        .gta-alert-box.error .alert-header {
-            background: #ff0000;
-            color: white;
-            text-shadow: 0 0 5px black;
-        }
-        .gta-alert-box.error .password-input {
-            border-color: #ff0000;
-            box-shadow: inset 0 0 10px rgba(255, 0, 0, 0.4);
-            color: #ff0000;
-            background: rgba(255, 0, 0, 0.1);
-        }
+        .gta-alert-box.error .alert-header { background: #ff0000; color: white; }
 
         @keyframes shake {
             10%, 90% { transform: scale(1) translate3d(-2px, 0, 0); }
@@ -242,59 +303,55 @@
             40%, 60% { transform: scale(1) translate3d(6px, 0, 0); }
         }
 
-        @keyframes pulse-marker {
-            0% { box-shadow: 0 0 0 0 rgba(255, 105, 180, 0.7); }
-            70% { box-shadow: 0 0 0 20px rgba(255, 105, 180, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 105, 180, 0); }
-        }
-
+        /* --- ESTADOS DE REVELACIÓN --- */
         .main-container::after {
             content: ""; position: absolute; inset: 0; z-index: 15; pointer-events: none;
             backdrop-filter: blur(35px) saturate(0.4) contrast(0.7);
             background: rgba(0, 0, 0, 0.35); transition: backdrop-filter 2.5s ease, background 2.5s ease;
         }
-        .main-container.revealed::after { backdrop-filter: none; background: rgba(255, 47, 146, 0); }
+        .scroll-wrapper.revealed .main-container::after { backdrop-filter: none; background: rgba(255, 47, 146, 0); }
 
-        .mission-marker { display: none; }
-        .door-trigger-area { pointer-events: none; }
+        .scroll-wrapper.activated .mission-marker { 
+            display: block; 
+            animation: markerReveal 0.9s cubic-bezier(0.175, 0.885, 0.32, 1.275), pulse-marker 1.5s infinite 0.9s ease-in-out; 
+        }
+        .scroll-wrapper.activated .door-trigger-area { pointer-events: auto; }
 
         @keyframes markerReveal {
-            0% { opacity: 0; transform: translateX(-50%) scale(0.4); box-shadow: 0 0 0 rgba(255, 105, 180, 0); }
-            60% { opacity: 1; transform: translateX(-50%) scale(1.15); box-shadow: 0 0 35px rgba(255, 105, 180, 0.9); }
-            100% { transform: translateX(-50%) scale(1); box-shadow: 0 0 25px rgba(255, 105, 180, 0.6); }
+            0% { opacity: 0; transform: scale(0.1); }
+            100% { opacity: 1; transform: scale(1); }
         }
-
-        .main-container.activated .mission-marker { display: block; animation: markerReveal 0.9s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .main-container.activated .door-trigger-area { pointer-events: auto; }
     </style>
 </head>
 <body>
 
     <div id="screenFlash" class="flash-effect"></div>
     <div id="fogBurst" class="fog-burst"></div>
+    
+    <div class="smoke-container">
+        <div class="smoke-particle s1"></div>
+        <div class="smoke-particle s2"></div>
+        <div class="smoke-particle s3"></div>
+        <div class="smoke-particle s4"></div>
+    </div>
+
+    <div class="spotlight left"></div>
+    <div class="spotlight right"></div>
+    <div class="strobe"></div>
+
+    <div class="hud-element hud-top-right">
+        <span class="gta-font countdown-label">MÁS INFO:</span>
+        <span class="gta-font" id="countdown">Cargando...</span>
+    </div>
 
     <audio id="openSound" src="https://assets.mixkit.co/active_storage/sfx/2570/2570-preview.m4a"></audio>
     <audio id="alertSound" src="https://assets.mixkit.co/active_storage/sfx/2866/2866-preview.m4a"></audio>
 
-    <div class="main-container">
-        <div class="smoke-container">
-            <div class="smoke-particle s1"></div>
-            <div class="smoke-particle s2"></div>
-            <div class="smoke-particle s3"></div>
-            <div class="smoke-particle s4"></div>
-        </div>
-
-        <div class="spotlight left"></div>
-        <div class="spotlight right"></div>
-        <div class="strobe"></div>
-
-        <div class="hud-element hud-top-right">
-            <span class="gta-font countdown-label">MÁS INFO:</span>
-            <span class="gta-font" id="countdown">Cargando...</span>
-        </div>
-
-        <div class="door-trigger-area" id="clubDoor">
-            <div class="mission-marker"></div>
+    <div class="scroll-wrapper" id="scroller">
+        <div class="main-container">
+            <div class="door-trigger-area" id="clubDoor">
+                <div class="mission-marker"></div>
+            </div>
         </div>
     </div>
 
@@ -313,6 +370,19 @@
     </div>
 
     <script>
+        // Lógica de centrado
+        const scroller = document.getElementById('scroller');
+        function centerImage() {
+            if (scroller && scroller.scrollWidth > scroller.clientWidth) {
+                scroller.scrollLeft = (scroller.scrollWidth - scroller.clientWidth) / 2;
+            }
+        }
+
+        centerImage();
+        document.addEventListener('DOMContentLoaded', centerImage);
+        window.addEventListener('load', centerImage);
+        window.addEventListener('resize', centerImage);
+
         document.addEventListener('DOMContentLoaded', () => {
             const door = document.getElementById('clubDoor');
             const modal = document.getElementById('alertModal');
@@ -330,11 +400,13 @@
             function updateCountdown() {
                 const now = new Date().getTime();
                 const distance = targetDate.getTime() - now;
+                
                 if (distance < 0) {
                     countdownElement.innerHTML = "SEE U SOON!";
-                    const container = document.querySelector('.main-container');
-                    container.classList.add('revealed');
-                    container.classList.add('activated');
+                    scroller.classList.add('revealed');
+                    scroller.classList.add('activated');
+                    // MODIFICACIÓN: Añadimos la clase al body para encender las luces
+                    document.body.classList.add('revealed'); 
                     return;
                 }
                 const days = Math.floor(distance / (1000 * 60 * 60 * 24));
@@ -363,23 +435,18 @@
                 setTimeout(() => secretInput.focus(), 100);
             });
 
-            // --- LÓGICA DEL CÓDIGO ACTUALIZADA ---
             secretInput.addEventListener('input', (e) => {
                 alertBox.classList.remove('error');
                 const val = e.target.value;
                 
                 if (val.length === 3) {
                     if (val === '000') {
-                        // CÓDIGO CORRECTO: Efecto fade-out y carga de la nueva página
                         document.body.style.transition = "opacity 0.8s ease-in-out";
                         document.body.style.opacity = "0";
-                        
                         setTimeout(() => {
-                            window.location.href = 'mapa.html'; // Aquí enlaza con tu segundo archivo
+                            window.location.href = 'mapa.html'; 
                         }, 800);
-
                     } else {
-                        // CÓDIGO INCORRECTO: Poner en rojo y temblar
                         alertBox.classList.add('error');
                         setTimeout(() => {
                             secretInput.value = '';
@@ -389,14 +456,8 @@
                 }
             });
 
-            function closeModal() {
-                modal.classList.remove('active');
-                secretInput.value = ''; 
-                alertBox.classList.remove('error');
-            }
-
             modal.addEventListener('click', (e) => { 
-                if (e.target === modal) closeModal(); 
+                if (e.target === modal) modal.classList.remove('active'); 
             });
         });
     </script>
