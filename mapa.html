@@ -18,7 +18,6 @@
             --hud-bg: rgba(0, 0, 0, 0.7);
         }
 
-        /* Bloqueo estricto total en el body/html */
         body, html {
             margin: 0;
             padding: 0;
@@ -26,16 +25,15 @@
             width: 100%;
             font-family: 'Arial', sans-serif;
             background-color: var(--gta-dark);
-            overflow: hidden; /* Ni vertical ni horizontal aquí */
+            overflow: hidden; 
         }
 
-        /* NUEVO: Contenedor específico para manejar el scroll horizontal */
         #scroll-container {
             width: 100vw;
             height: 100vh;
             overflow-x: auto;
             overflow-y: hidden;
-            -webkit-overflow-scrolling: touch; /* Scroll suave nativo en iOS */
+            -webkit-overflow-scrolling: touch; 
             scroll-behavior: smooth;
         }
 
@@ -81,6 +79,52 @@
             background-color: #050505;
             overflow: hidden;
             margin: 0; 
+        }
+
+        /* --- TICKETS SOON (MODIFICADO CON ANIMACIÓN) --- */
+        .tickets-marker {
+            position: fixed; 
+            top: 11%; 
+            left: 53%; 
+            transform: translateX(-50%); 
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid var(--neon-pink);
+            padding: 10px 25px;
+            color: white;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            cursor: pointer;
+            z-index: 250; 
+            white-space: nowrap;
+            /* Aplicamos la nueva animación */
+            animation: neonPulse 1.5s infinite alternate ease-in-out;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        /* Animación de latido y resplandor neón */
+        @keyframes neonPulse {
+            0% {
+                box-shadow: 0 0 5px rgba(255, 47, 146, 0.4), inset 0 0 5px rgba(255, 47, 146, 0.4);
+                text-shadow: 0 0 2px rgba(255, 47, 146, 0.5);
+                transform: translateX(-50%) scale(1);
+            }
+            100% {
+                box-shadow: 0 0 20px rgba(255, 47, 146, 1), 0 0 40px rgba(255, 47, 146, 0.8), inset 0 0 10px rgba(255, 47, 146, 0.8);
+                text-shadow: 0 0 8px rgba(255, 47, 146, 1), 0 0 15px rgba(255, 47, 146, 0.8);
+                transform: translateX(-50%) scale(1.08); /* Crece ligeramente */
+            }
+        }
+
+        /* Efecto al pasar el ratón */
+        .tickets-marker:hover {
+            animation: none; /* Pausamos el latido para que se quede encendido */
+            background: var(--neon-pink);
+            color: black;
+            transform: translateX(-50%) scale(1.12); /* Crece un poco más al hacer hover */
+            box-shadow: 0 0 30px var(--neon-pink), 0 0 60px var(--neon-pink);
+            text-shadow: none;
         }
 
         /* --- EFECTOS AMBIENTALES --- */
@@ -219,14 +263,14 @@
             left: 50%;
             transform: translateX(-50%);
             z-index: 150;
-            gap: 50px; 
+            gap: 30px; 
         }
 
         .nav-btn {
             background: rgba(0, 0, 0, 0.7);
             border: 2px solid var(--neon-pink);
             color: var(--neon-pink);
-            width: 55px; height: 55px;
+            width: 45px; height: 45px;
             border-radius: 50%;
             font-size: 1.5rem;
             display: flex; justify-content: center; align-items: center;
@@ -244,6 +288,7 @@
             .spotlight { width: 100vw; }
             .spotlight.left { left: 25%; }
             .spotlight.right { right: 25%; }
+            .tickets-marker { font-size: 1rem; top: 11%; } 
         }
     </style>
 </head>
@@ -254,6 +299,8 @@
 
     <audio id="openSound" src="https://assets.mixkit.co/active_storage/sfx/2570/2570-preview.m4a"></audio>
     <audio id="alertSound" src="https://assets.mixkit.co/active_storage/sfx/2866/2866-preview.m4a"></audio>
+
+    <div id="ticketsSoon" class="tickets-marker">Tickets Soon</div>
 
     <div id="scroll-container">
         <div class="main-container">
@@ -308,16 +355,19 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Referencia al nuevo contenedor de scroll
             const scrollContainer = document.getElementById('scroll-container');
 
-            // Centrado horizontal inicial
             const centerContent = () => {
                 const scrollX = (scrollContainer.scrollWidth - window.innerWidth) / 2;
                 scrollContainer.scrollTo(scrollX, 0);
             };
 
             centerContent();
+
+            // REDIRECCIÓN TICKETS
+            document.getElementById('ticketsSoon').addEventListener('click', () => {
+                window.location.href = 'https://tu-enlace.com'; // Sustituye esto
+            });
 
             const flash = document.getElementById('screenFlash');
             const burst = document.getElementById('fogBurst');
@@ -346,15 +396,12 @@
                 });
             });
 
-            // LÓGICA DE NAVEGACIÓN MÓVIL CORREGIDA
             const btnLeft = document.getElementById('btnScrollLeft');
             const btnRight = document.getElementById('btnScrollRight');
             
             const moveScroll = (direction) => {
                 const amount = window.innerWidth * 0.7; 
                 const target = direction === 'left' ? -amount : amount;
-                
-                // Forzamos el scroll en el contenedor específico, NO en window
                 scrollContainer.scrollBy({
                     left: target,
                     top: 0,
